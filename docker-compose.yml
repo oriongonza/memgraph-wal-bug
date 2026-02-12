@@ -1,0 +1,14 @@
+services:
+  memgraph:
+    image: memgraph/memgraph:3.7.2
+    ports:
+      - "7687:7687"
+    volumes:
+      - mg_data:/var/lib/memgraph
+    command: 
+      - "--storage-mode=ON_DISK_TRANSACTIONAL"
+      - "--storage-wal-enabled=true"
+      - "--data-recovery-on-startup=true"
+
+volumes:
+  mg_data:
