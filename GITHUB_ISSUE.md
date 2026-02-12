@@ -12,15 +12,25 @@ Security analysis + fix suggestion for this issue.
 
 ### Security Assessment
 
-Tested 7 payloads (nulls, ASCII, pointers, format strings, random). All crash identically - same location, same error. Crash happens during validation before data interpretation.
+Tested 7 payloads:
 
-**Verdict:** DoS only, not exploitable for RCE. CVSS 5.3 (Medium).
+| Payload | Content | Exit |
+|---------|---------|------|
+| null | `\x00` × 5 | 139 |
+| ascii | `A` × 5 | 139 |
+| long | `A` × 100 | 139 |
+| ptr-like | `\x41\x41\x41\x41\x41\x41\x00\x00` | 139 |
+| random | 16 random bytes | 139 |
+| fmt-str | `%x%x%x%x%x%x` | 139 |
+| nul-term | `ABC\0DEF\0GHI` | 139 |
+
+All identical crash. Validation fails before data interpretation → DoS only, not RCE. CVSS 5.3.
 
 ### Root Cause
 
 Exception during RocksDB init → virtual method called on partially-constructed object → SIGSEGV.
 
-### Fix
+### Suggested fix
 
 Use status API instead of exceptions:
 
